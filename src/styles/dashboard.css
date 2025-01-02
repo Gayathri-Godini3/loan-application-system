@@ -1,0 +1,139 @@
+/* Dashboard Container */
+.dashboard-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+  }
+
+  /* Profile Section */
+  .profile-section {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .profile-section h2 {
+    color: #007BFF;
+    font-size: 24px;
+  }
+
+  .profile-section p {
+    font-size: 16px;
+    color: #555;
+  }
+
+  /* Loan Applications Section */
+  .loan-applications {
+    margin-top: 20px;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .loan-applications h4 {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 10px;
+  }
+
+  .loan-applications ul {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  .loan-applications li {
+    background-color: #f1f1f1;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 8px;
+  }
+
+  .loan-applications li p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #333;
+  }
+
+  /* Apply Loan Section */
+  .apply-loan-section {
+    margin-top: 20px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .apply-loan-section h3 {
+    font-size: 22px;
+    color: #007BFF;
+    margin-bottom: 15px;
+  }
+
+  .apply-loan-section form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .apply-loan-section input,
+  .apply-loan-section textarea {
+    flex: 1 1 45%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+
+  .apply-loan-section textarea {
+    resize: vertical;
+  }
+
+  .apply-loan-section button {
+    background-color: #28a745;
+    color: white;
+    font-size: 16px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .apply-loan-section button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+
+  .apply-loan-section button:hover {
+    background-color: #218838;
+  }
+  .toggle-applications-btn {
+    margin: 15px 0;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .toggle-applications-btn:hover {
+    background-color: #0056b3;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 600px) {
+    .apply-loan-section form {
+      flex-direction: column;
+    }
+
+    .apply-loan-section input,
+    .apply-loan-section textarea {
+      flex: 1 1 100%;
+    }
+  }

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import '../styles/dashboard.css';
 
 const UserDashboard = () => {
   const [userData, setUserData] = useState(null);
@@ -16,33 +18,29 @@ const UserDashboard = () => {
     cibilScore: '',
   });
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [loadingProfile, setLoadingProfile] = useState(false);
+  const [loadingLoans, setLoadingLoans] = useState(false);
 
   const token = localStorage.getItem('token'); // Retrieve token from localStorage
+  const navigate = useNavigate(); // Initialize navigate function
 
   // Fetch user data and loan applications
   useEffect(() => {
     if (token) {
+      setLoadingProfile(true);
       axios
         .get('http://localhost:5000/api/user/profile', {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
           setUserData(response.data);
         })
         .catch((error) => {
           console.error("Error fetching user data:", error);
-        });
-
-      axios
-        .get('http://localhost:5000/api/user/loan-applications', {
-          headers: { Authorization: `Bearer ${token}` }
         })
-        .then((response) => {
-          setLoanApplications(response.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching loan applications:", error);
-        });
+        .finally(() => setLoading(false));
     }
   }, [token]);
 
@@ -52,141 +50,97 @@ const UserDashboard = () => {
     setApplicationData({ ...applicationData, [name]: value });
   };
 
+  // Validate loan application
+  const validateApplication = () => {
+    if (!applicationData.name || !applicationData.email || !applicationData.phone) {
+      return 'Name, Email and Phone are required.';
+    }
+    if (applicationData.age < 18 || applicationData.age > 65) {
+      return 'Age must be between 18 and 65';
+    }
+    if (applicationData.cibilScore < 300 || applicationData.cibilScore > 900) {
+      return 'CIBIL score must be between 300 and 900';
+    }
+    if (applicationData.loanAmount <= 0) {
+      return 'Loan amount must be greater than zero';
+    }
+    return '';
+  };
+
   // Submit loan application
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!applicationData.name || !applicationData.email || !applicationData.phone) {
-      setMessage('Please fill out all required fields');
+    const validationError = validateApplication();
+    if (validationError) {
+      setMessage(validationError);
       return;
     }
 
-    axios
-      .post('http://localhost:5000/api/user/apply', applicationData, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      .then((response) => {
-        setMessage('Loan application submitted successfully');
-        setLoanApplications([...loanApplications, applicationData]);
-        setApplicationData({
-          name: '',
-          email: '',
-          phone: '',
-          age: '',
-          address: '',
-          monthlyIncome: '',
-          loanAmount: '',
-          tenure: '',
-          cibilScore: '',
-        });
-      })
-      .catch((error) => {
-        setMessage('Error submitting loan application');
-        console.error(error);
+    setSubmitting(true);
+    setMessage('');
+
+    try {
+      const response = await axios.post(
+        'http://localhost:5000/api/user/apply',
+        applicationData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setMessage('Loan application submitted successfully.');
+      setLoanApplications([...loanApplications, response.data]);
+      setApplicationData({
+        name: '',
+        email: '',
+        phone: '',
+        age: '',
+        address: '',
+        monthlyIncome: '',
+        loanAmount: '',
+        tenure: '',
+        cibilScore: '',
       });
+
+      // Redirect to acknowledgment page after submission
+      navigate("/acknowledgementpage");
+    } catch (error) {
+      setMessage('Error submitting loan application. Please try again.');
+      console.error(error);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
+  if (loading) return <h3>Loading...</h3>;
+
   return (
-    <div className="user-dashboard">
+    <div className="dashboard-container">
       {userData ? (
         <div className="profile-section">
           <h2>Welcome, {userData.name}</h2>
-          <p>Email: {userData.email}</p>
-          <p>Phone: {userData.phone}</p>
+          <p>We're here to help you with your loan application.</p>
         </div>
       ) : (
         <p>Loading user data...</p>
       )}
 
-      <h3>Loan Applications</h3>
-      {message && <p>{message}</p>}
-
-      <div className="loan-applications">
-        <h4>Your Previous Loan Applications</h4>
-        {loanApplications.length > 0 ? (
-          <ul>
-            {loanApplications.map((loan, index) => (
-              <li key={index}>
-                <p>Loan Amount: {loan.loanAmount}</p>
-                <p>Status: {loan.status || "Pending"}</p>
-                <p>Tenure: {loan.tenure} months</p>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No loan applications found.</p>
-        )}
-      </div>
-
       <div className="apply-loan-section">
         <h3>Apply for a New Loan</h3>
+        {message && <p>{message}</p>}
         <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="name"
-            placeholder="Name"
-            value={applicationData.name}
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={applicationData.email}
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="tel"
-            name="phone"
-            placeholder="Phone"
-            value={applicationData.phone}
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="number"
-            name="age"
-            placeholder="Age"
-            value={applicationData.age}
-            onChange={handleChange}
-          />
-          <textarea
-            name="address"
-            placeholder="Address"
-            value={applicationData.address}
-            onChange={handleChange}
-          />
-          <input
-            type="number"
-            name="monthlyIncome"
-            placeholder="Monthly Income"
-            value={applicationData.monthlyIncome}
-            onChange={handleChange}
-          />
-          <input
-            type="number"
-            name="loanAmount"
-            placeholder="Loan Amount"
-            value={applicationData.loanAmount}
-            onChange={handleChange}
-          />
-          <input
-            type="number"
-            name="tenure"
-            placeholder="Loan Tenure (in months)"
-            value={applicationData.tenure}
-            onChange={handleChange}
-          />
-          <input
-            type="number"
-            name="cibilScore"
-            placeholder="CIBIL Score"
-            value={applicationData.cibilScore}
-            onChange={handleChange}
-          />
-          <button type="submit">Submit Loan Application</button>
+          {Object.keys(applicationData).map((key) => (
+            <input
+              key={key}
+              type={key === "email" ? "email" : key === "phone" ? "tel" : "text"}
+              name={key}
+              placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
+              value={applicationData[key]}
+              onChange={handleChange}
+              required={["name", "email", "phone"].includes(key)}
+            />
+          ))}
+          <button type="submit" disabled={submitting}>
+            {submitting ? "Submitting..." : "Submit Loan Application"}
+          </button>
         </form>
       </div>
     </div>

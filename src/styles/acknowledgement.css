@@ -1,0 +1,19 @@
+.acknowledgment-container {
+    text-align: center;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    max-width: 600px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .acknowledgment-container h2 {
+    color: #4caf50;
+  }
+
+  .acknowledgment-container p {
+    color: #555;
+    font-size: 1.2rem;
+  }
